@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Github, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,49 +10,50 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        alert(error);
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await res.json();
       setIsLoading(false);
-      alert(`Welcome back, Willy L. Jaranilla III!`); //
+      alert(`Welcome back, ${data.fullName}!`);
       window.location.href = "/";
-    }, 1500);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
       {/* Container - max-w-100 (approx 400px) */}
       <div className="w-full max-w-100 space-y-6">
         {/* Header Section */}
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-[#2d2f31]">
-            Log in to your Tresify account
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Log in to Nexus LMS
           </h1>
           <p className="text-sm text-slate-600">
-            Build systems like 4Sisters Sales and Inventory.
+            Welcome back to your learning journey.
           </p>
         </div>
 
-        {/* Social Logins Simulation */}
-        <div className="space-y-3">
-          <button className="w-full h-12 flex items-center justify-center gap-3 border border-[#2d2f31] font-bold hover:bg-slate-50 transition">
-            <Github size={20} /> Continue with GitHub
-          </button>
-          <button className="w-full h-12 flex items-center justify-center gap-3 border border-[#2d2f31] font-bold hover:bg-slate-50 transition">
-            <div className="w-5 h-5 bg-red-500 rounded-full" /> Continue with
-            Google
-          </button>
-        </div>
 
-        <div className="relative flex items-center py-2">
-          <div className="flex-grow border-t border-slate-200"></div>
-          <span className="flex-shrink-0 mx-4 text-xs font-bold text-slate-400">
-            OR
-          </span>
-          <div className="flex-grow border-t border-slate-200"></div>
-        </div>
 
         {/* Standard Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -65,7 +66,7 @@ export default function LoginPage() {
               required
               type="email"
               placeholder="Email"
-              className="w-full h-12 pl-12 pr-4 border border-[#2d2f31] rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="w-full h-12 pl-12 pr-4 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out font-medium"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
@@ -79,7 +80,7 @@ export default function LoginPage() {
               required
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full h-12 pl-12 pr-12 border border-[#2d2f31] rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="w-full h-12 pl-12 pr-12 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out font-medium"
               onChange={(e) => setPassword(e.target.value)}
             />
             <button
@@ -93,7 +94,7 @@ export default function LoginPage() {
 
           <button
             disabled={isLoading}
-            className={`w-full h-12 bg-[#a435f0] text-white font-bold hover:bg-[#8710d8] transition flex items-center justify-center ${
+            className={`w-full h-12 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-700 transition-all duration-300 ease-in-out flex items-center justify-center shadow-[0_4px_14px_0_rgba(124,58,237,0.39)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.23)] hover:-translate-y-0.5 ${
               isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
@@ -104,13 +105,13 @@ export default function LoginPage() {
         <div className="text-center space-y-4">
           <Link
             href="#"
-            className="text-sm font-bold text-[#a435f0] hover:text-[#8710d8] block"
+            className="text-sm font-bold text-violet-600 hover:text-violet-700 block transition-all duration-300 ease-in-out"
           >
             Forgot Password?
           </Link>
           <p className="text-sm text-slate-600">
             Don't have an account?{" "}
-            <Link href="#" className="font-bold text-[#a435f0] hover:underline">
+            <Link href="/signup" className="font-bold text-violet-600 hover:text-violet-700 hover:underline transition-all duration-300 ease-in-out">
               Sign up
             </Link>
           </p>

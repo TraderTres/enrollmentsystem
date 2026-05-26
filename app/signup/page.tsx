@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Github, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,28 +14,45 @@ export default function SignUpPage() {
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        alert(error);
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(false);
       alert(`Account created successfully for ${formData.fullName}!`);
       window.location.href = "/login";
-    }, 1500);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
       {/* Container - Optimized max-w */}
       <div className="w-full max-w-100 space-y-6">
         {/* Header Section */}
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-[#2d2f31]">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Learn to build systems
           </h1>
           <p className="text-sm text-slate-600">
-            Join Tresify and master systems here.
+            Join Nexus LMS and master systems here.
           </p>
         </div>
 
@@ -51,7 +68,7 @@ export default function SignUpPage() {
               required
               type="text"
               placeholder="Full Name"
-              className="w-full h-12 pl-12 pr-4 border border-[#2d2f31] rounded focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium"
+              className="w-full h-12 pl-12 pr-4 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent font-medium shadow-sm transition-all duration-300 ease-in-out"
               onChange={(e) =>
                 setFormData({ ...formData, fullName: e.target.value })
               }
@@ -68,7 +85,7 @@ export default function SignUpPage() {
               required
               type="email"
               placeholder="Email"
-              className="w-full h-12 pl-12 pr-4 border border-[#2d2f31] rounded focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium"
+              className="w-full h-12 pl-12 pr-4 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent font-medium shadow-sm transition-all duration-300 ease-in-out"
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
@@ -85,7 +102,7 @@ export default function SignUpPage() {
               required
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full h-12 pl-12 pr-12 border border-[#2d2f31] rounded focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium"
+              className="w-full h-12 pl-12 pr-12 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent font-medium shadow-sm transition-all duration-300 ease-in-out"
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
@@ -102,7 +119,7 @@ export default function SignUpPage() {
           <div className="flex items-start gap-2 py-2">
             <input
               type="checkbox"
-              className="mt-1 accent-purple-600"
+              className="mt-1 accent-violet-600 rounded"
               required
             />
             <p className="text-xs text-slate-600 leading-tight">
@@ -113,7 +130,7 @@ export default function SignUpPage() {
 
           <button
             disabled={isLoading}
-            className={`w-full h-12 bg-[#a435f0] text-white font-bold hover:bg-[#8710d8] transition flex items-center justify-center ${
+            className={`w-full h-12 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-700 transition-all duration-300 ease-in-out flex items-center justify-center shadow-[0_4px_14px_0_rgba(124,58,237,0.39)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.23)] hover:-translate-y-0.5 ${
               isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
@@ -134,7 +151,7 @@ export default function SignUpPage() {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-bold text-[#a435f0] hover:underline"
+              className="font-bold text-violet-600 hover:text-violet-700 hover:underline transition-all duration-300 ease-in-out"
             >
               Log in
             </Link>

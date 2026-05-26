@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import { CartProvider } from "@/lib/CartContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Tresify | Learning Enrollment System",
-  description: "Advanced LMS built with Next.js",
+  title: "Nexus LMS | Elevate Your Learning",
+  description: "Premium Advanced LMS built with Next.js",
 };
 
 export default function RootLayout({
@@ -17,10 +18,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-white text-[#2d2f31]`}>
-        <Navbar />
-        {/* Main content wrapper */}
-        <main className="min-h-screen">{children}</main>
+      <body className={`${outfit.className} bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 antialiased`}>
+        <CartProvider>
+          <Navbar />
+          {/* Main content wrapper */}
+          <main className="min-h-screen">{children}</main>
+        </CartProvider>
       </body>
     </html>
   );

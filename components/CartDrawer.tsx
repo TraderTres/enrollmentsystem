@@ -2,6 +2,7 @@
 
 import { X, ShoppingBag, Trash2 } from "lucide-react";
 import Image from "next/image";
+import { useCart } from "@/lib/CartContext";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -9,22 +10,7 @@ interface CartDrawerProps {
 }
 
 export const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
-  const cartItems = [
-    {
-      id: "1",
-      title: "Full-Stack Web Development: HTML and CSS",
-      price: 1999,
-      thumbnail: "https://images.unsplash.com/photo-1587620962725-abab7fe55159",
-    },
-    {
-      id: "8",
-      title: "Next.js 15: The Complete Guide",
-      price: 2800,
-      thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee",
-    },
-  ];
-
-  const total = cartItems.reduce((acc, item) => acc + item.price, 0);
+  const { cartItems, total, removeFromCart } = useCart();
 
   return (
     <>
@@ -40,11 +26,13 @@ export const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
       >
         <div className="flex flex-col h-full">
           {/* Drawer Header */}
-          <div className="p-4 border-b flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShoppingBag size={20} className="text-[#a435f0]" />
-              <h2 className="font-bold text-lg text-[#2d2f31]">
-                Shopping Cart
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-violet-50 rounded-full">
+                <ShoppingBag size={20} className="text-violet-600" />
+              </div>
+              <h2 className="font-extrabold text-xl text-slate-900 tracking-tight">
+                Your Cart
               </h2>
             </div>
             <button
@@ -57,43 +45,54 @@ export const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
 
           {/* Cart Items List */}
           <div className="flex-grow overflow-y-auto p-4 space-y-4">
-            {cartItems.map((item) => (
-              <div key={item.id} className="flex gap-3 group">
-                <div className="relative aspect-video w-24 h-14 flex-shrink-0 border rounded overflow-hidden">
-                  <Image
-                    src={item.thumbnail}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex flex-col flex-grow">
-                  <h3 className="text-xs font-bold text-[#2d2f31] line-clamp-2 leading-tight">
-                    {item.title}
-                  </h3>
-                  <p className="text-[10px] text-slate-500 mt-1">
-                    ₱{item.price.toLocaleString()}
-                  </p>
-                </div>
-                <button className="text-slate-400 hover:text-red-500 transition self-start p-1">
-                  <Trash2 size={14} />
-                </button>
+            {cartItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                <ShoppingBag size={48} className="mb-4 opacity-50" />
+                <p className="font-semibold text-slate-600">Your cart is empty.</p>
+                <p className="text-sm mt-1">Keep shopping to find a course!</p>
               </div>
-            ))}
+            ) : (
+              cartItems.map((item) => (
+                <div key={item.id} className="flex gap-3 group">
+                  <div className="relative aspect-video w-24 h-14 flex-shrink-0 border rounded overflow-hidden">
+                    <Image
+                      src={item.thumbnail}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-grow justify-center">
+                    <h3 className="text-sm font-bold text-slate-900 line-clamp-2 leading-tight hover:text-violet-600 transition-all duration-300 ease-in-out cursor-pointer">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs font-bold text-slate-500 mt-1.5">
+                      ₱{item.price.toLocaleString()}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => removeFromCart(item.id)}
+                    className="text-slate-400 hover:text-red-500 transition self-start p-1"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))
+            )}
           </div>
 
           {/* Drawer Footer - Checkout Section */}
-          <div className="p-6 border-t bg-slate-50">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-slate-600 font-medium">Total:</span>
-              <span className="text-xl font-bold text-[#2d2f31]">
+          <div className="p-6 border-t border-slate-100 bg-slate-50/80 backdrop-blur-md">
+            <div className="flex justify-between items-center mb-5">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider text-sm">Total:</span>
+              <span className="text-2xl font-black text-slate-900 tracking-tight">
                 ₱{total.toLocaleString()}
               </span>
             </div>
-            <button className="w-full py-3 bg-[#a435f0] text-white font-bold rounded hover:bg-[#8710d8] transition shadow-md">
+            <button className="w-full py-4 bg-violet-600 text-white font-bold rounded-xl shadow-[0_4px_14px_0_rgba(124,58,237,0.39)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.23)] hover:bg-violet-700 transition-all duration-300 ease-in-out hover:-translate-y-0.5">
               Checkout Now
             </button>
-            <p className="text-[10px] text-center text-slate-500 mt-3 italic">
+            <p className="text-xs text-center text-slate-400 mt-4 font-medium">
               *Taxes and discounts calculated at checkout
             </p>
           </div>

@@ -34,12 +34,12 @@ export const CourseCard = ({
 
   const tagColor =
     tag === "Bestseller"
-      ? "bg-amber-400 text-black"
+      ? "bg-amber-400 text-slate-900"
       : tag === "New"
-        ? "bg-[#10b981] text-white"
+        ? "bg-emerald-500 text-white"
         : tag === "Hot"
-          ? "bg-red-600 text-white"
-          : "bg-[#a435f0] text-white";
+          ? "bg-rose-500 text-white"
+          : "bg-violet-600 text-white";
 
   return (
     <Link
@@ -48,9 +48,9 @@ export const CourseCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex flex-col gap-2 h-full bg-white transition-all duration-300">
+      <div className="flex flex-col gap-3 h-full bg-white/90 backdrop-blur-md border border-slate-200 shadow-sm rounded-2xl p-3 transition-all duration-300 ease-in-out group-hover:shadow-xl group-hover:-translate-y-1">
         {/* Thumbnail Section with Video Preview support */}
-        <div className="relative aspect-video w-full border border-slate-200 overflow-hidden rounded-sm bg-slate-900">
+        <div className="relative aspect-video w-full border border-slate-100/50 overflow-hidden rounded-xl bg-slate-900 shadow-sm">
           {/* Base Image Thumbnail */}
           <Image
             src={thumbnail}
@@ -91,26 +91,26 @@ export const CourseCard = ({
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col gap-1 flex-grow">
-          <h3 className="font-bold text-[#2d2f31] line-clamp-2 h-10 leading-tight group-hover:text-[#a435f0] transition-colors">
+        <div className="flex flex-col gap-1 flex-grow px-1 pb-1">
+          <h3 className="font-bold text-slate-900 line-clamp-2 h-10 leading-tight group-hover:text-violet-600 transition-all duration-300 ease-in-out">
             {title}
           </h3>
-          <p className="text-xs text-[#6a6f73]">{instructor}</p>
+          <p className="text-xs text-slate-500 font-medium">{instructor}</p>
 
           {/* Conditional Rendering: Progress Bar or Price/Ratings */}
           {progress !== null && progress !== undefined ? (
-            <div className="flex flex-col gap-1 mt-auto pt-2">
-              <div className="w-full bg-[#f7f9fa] border border-slate-100 h-2 rounded-full overflow-hidden">
+            <div className="flex flex-col gap-1.5 mt-auto pt-3 border-t border-slate-100/50">
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner">
                 <div
-                  className="bg-[#10b981] h-full transition-all duration-1000 ease-out"
+                  className="bg-violet-500 h-full transition-all duration-1000 ease-out rounded-full"
                   style={{ width: `${progress}%` }}
                 />
               </div>
               <div className="flex justify-between items-center">
-                <p className="text-[10px] font-bold text-[#10b981]">
+                <p className="text-[10px] font-bold text-violet-600">
                   {Math.round(progress)}% Complete
                 </p>
-                <p className="text-[10px] text-[#6a6f73] italic">
+                <p className="text-[10px] text-slate-400 italic">
                   {progress === 100 ? "Finished" : "Keep going!"}
                 </p>
               </div>
@@ -118,27 +118,27 @@ export const CourseCard = ({
           ) : (
             <>
               {/* Ratings Section */}
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-[#b4690e] font-bold text-sm">
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="text-amber-500 font-bold text-sm">
                   {rating.toFixed(1)}
                 </span>
-                <div className="flex text-[#b4690e]">
+                <div className="flex text-amber-500">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       size={12}
-                      fill={i < Math.floor(rating) ? "#b4690e" : "transparent"}
+                      fill={i < Math.floor(rating) ? "currentColor" : "transparent"}
                       strokeWidth={i < Math.floor(rating) ? 0 : 2}
                     />
                   ))}
                 </div>
-                <span className="text-xs text-[#6a6f73]">
+                <span className="text-xs text-slate-400 font-medium">
                   ({reviews.toLocaleString()})
                 </span>
               </div>
 
               {/* Price display */}
-              <div className="font-bold text-[#2d2f31] mt-auto pt-1">
+              <div className="font-extrabold text-slate-900 mt-auto pt-2 text-lg">
                 ₱{price.toLocaleString()}
               </div>
             </>

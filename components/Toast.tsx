@@ -20,18 +20,18 @@ export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-20 right-4 z-[1000] animate-in fade-in slide-in-from-top-4 duration-300">
-      <div className="bg-white border-l-4 border-[#10b981] shadow-2xl rounded-md p-4 flex items-center gap-3 min-w-[300px]">
-        <CheckCircle className="text-[#10b981]" size={20} />
+    <div className="fixed top-24 right-6 z-[1000] animate-in fade-in slide-in-from-top-8 duration-300">
+      <div className="bg-white/90 backdrop-blur-md border border-slate-200 shadow-lg border-l-4 border-l-violet-500 rounded-xl p-4 flex items-center gap-4 min-w-[320px]">
+        <CheckCircle className="text-violet-500" size={24} />
         <div className="flex-grow">
-          <p className="text-sm font-bold text-[#2d2f31]">{message}</p>
-          <p className="text-[10px] text-slate-500">
-            Added to your shopping cart.
+          <p className="text-sm font-bold text-slate-900">{message}</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Added to your learning cart.
           </p>
         </div>
         <button
           onClick={onClose}
-          className="text-slate-400 hover:text-black transition"
+          className="text-slate-400 hover:text-slate-800 hover:bg-slate-100 p-1 rounded-full transition-smooth"
         >
           <X size={16} />
         </button>

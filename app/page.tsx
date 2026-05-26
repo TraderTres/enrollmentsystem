@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { CourseCard } from "@/components/CourseCard";
 import { Toast } from "@/components/Toast";
+import { useCart } from "@/lib/CartContext";
 
 const webDevVideo =
   "https://assets.mixkit.co/videos/preview/mixkit-hands-typing-on-a-laptop-keyboard-in-close-up-shot-1588-large.mp4";
@@ -19,9 +20,16 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { addToCart } = useCart();
 
-  const handleAddToCart = (courseTitle: string) => {
-    setToastMessage(courseTitle);
+  const handleAddToCart = (course: any) => {
+    addToCart({
+      id: course.id,
+      title: course.title,
+      price: course.price,
+      thumbnail: course.imageUrl,
+    });
+    setToastMessage(course.title);
     setShowToast(true);
   };
 
@@ -36,82 +44,42 @@ export default function Home() {
     "Mobile Development",
   ];
 
-  const staticCourses = [
-    {
-      id: "1",
-      title: "Full-Stack Web Development: HTML and CSS",
-      instructor: { name: "Willy Jaranilla III" },
-      imageUrl: "https://images.unsplash.com/photo-1587620962725-abab7fe55159",
-      previewVideoUrl: webDevVideo,
-      price: 1999,
-      category: "Web Development",
-      progress: 45,
-      tag: "Bestseller",
-      isPublished: true,
-    },
-    {
-      id: "2",
-      title: "Advanced Inventory System Architecture",
-      instructor: { name: "John Doe" },
-      imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
-      price: 2499,
-      category: "Software Systems",
-      tag: "Trending",
-      isPublished: true,
-    },
-    {
-      id: "3",
-      title: "UI/UX Foundations for Developers",
-      instructor: { name: "Alex Rivera" },
-      imageUrl: "https://images.unsplash.com/photo-1561070791-2526d30994b5",
-      previewVideoUrl: designVideo,
-      price: 1999,
-      category: "Design",
-      progress: 100,
-      tag: "Hot",
-      isPublished: true,
-    },
-    {
-      id: "6",
-      title: "Ethical Hacking: Cybersecurity Essentials",
-      instructor: { name: "Mark Anthony" },
-      imageUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b",
-      previewVideoUrl: cyberVideo,
-      price: 3500,
-      category: "Cybersecurity",
-      progress: null,
-      isPublished: true,
-    },
-    {
-      id: "8",
-      title: "Next.js 15: The Complete Guide",
-      instructor: { name: "Willy Jaranilla III" },
-      imageUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee",
-      price: 2800,
-      category: "Web Development",
-      tag: "New",
-      isPublished: true,
-    },
-  ];
+  const [courses, setCourses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuthAndProgress = () => {
-      const authStatus = localStorage.getItem("isLoggedIn");
-      setIsLoggedIn(authStatus === "true");
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("/api/courses");
+        if (!res.ok) throw new Error("Failed to fetch courses");
+        const data = await res.json();
+        setCourses(data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    checkAuthAndProgress();
-    window.addEventListener("storage", checkAuthAndProgress);
-    return () => window.removeEventListener("storage", checkAuthAndProgress);
+    fetchCourses();
   }, []);
 
-  const toggleDemoAuth = () => {
-    const newStatus = !isLoggedIn;
-    setIsLoggedIn(newStatus);
-    localStorage.setItem("isLoggedIn", newStatus.toString());
-    window.dispatchEvent(new Event("storage"));
-  };
+  useEffect(() => {
+    const checkAuthAndProgress = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+    checkAuthAndProgress();
+  }, []);
 
-  const filteredCourses = staticCourses.filter((course) => {
+  const filteredCourses = courses.filter((course) => {
     const matchesSearch = course.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -130,53 +98,59 @@ export default function Home() {
       />
 
       {/* Hero Header Section */}
-      <div className="bg-[#2d2f31] text-white py-16 px-8 mb-8">
-        <div className="max-w-360 mx-auto">
-          <h1 className="text-5xl font-bold mb-4 tracking-tight">
-            Learn to build systems.
+      <div className="relative overflow-hidden bg-slate-950 text-white py-16 md:py-24 px-6 md:px-8 mb-8 md:mb-12 rounded-b-[2rem] md:rounded-b-[3rem] shadow-2xl mx-0 sm:mx-2 md:mx-4 mt-2">
+        {/* Glow Effects */}
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[150%] bg-violet-600/30 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[150%] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="max-w-360 mx-auto relative z-10">
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            Elevate Your <br className="hidden md:block" />
+            Learning Journey.
           </h1>
-          <p className="text-xl opacity-90 max-w-2xl mb-8">
-            Join Tresify and master systems here.
+          <p className="text-lg md:text-2xl text-slate-300 max-w-2xl mb-10 leading-relaxed font-light">
+            Join Nexus LMS and master modern systems, design, and engineering with industry-leading experts.
           </p>
           {isLoggedIn ? (
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <Link href="/instructor">
-                <button className="px-6 py-3 bg-[#a435f0] font-bold rounded hover:bg-[#8710d8] transition shadow-md">
+                <button className="px-8 py-4 bg-violet-600 text-white font-bold rounded-full hover:bg-violet-500 transition-all duration-300 ease-in-out shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] hover:-translate-y-1">
                   Instructor Dashboard
                 </button>
               </Link>
-              <button className="px-6 py-3 border border-white font-bold rounded hover:bg-white/10 transition">
+              <button className="px-8 py-4 bg-white/5 border border-white/10 font-bold rounded-full hover:bg-white/10 transition-all duration-300 ease-in-out backdrop-blur-sm">
                 My Learning
               </button>
             </div>
           ) : (
             <Link href="/signup">
-              <button className="px-10 py-4 bg-white text-[#2d2f31] font-bold rounded shadow-xl hover:bg-slate-100 transition transform hover:scale-105 text-lg">
-                Join Now
+              <button className="px-10 py-4 bg-white text-slate-900 font-bold rounded-full shadow-xl hover:bg-slate-100 transition-all duration-300 ease-in-out transform hover:scale-105 text-lg flex items-center gap-2 group">
+                Start Learning Now
+                <span className="group-hover:translate-x-1 transition-all duration-300 ease-in-out">→</span>
               </button>
             </Link>
           )}
         </div>
       </div>
 
-      <div className="max-w-360 mx-auto px-8 pb-12">
+      <div className="max-w-360 mx-auto px-4 sm:px-8 pb-12">
         {/* Search Bar Simulation */}
-        <div className="mb-8 max-w-150">
-          <label className="block text-sm font-bold mb-2 text-slate-700">
+        <div className="mb-10 max-w-150">
+          <label className="block text-sm font-bold mb-3 text-slate-700">
             Search Courses
           </label>
-          <div className="relative">
+          <div className="relative group">
             <input
               type="text"
               placeholder="Search by title (e.g. Next.js, Web...)"
-              className="w-full h-12 px-4 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              className="w-full h-14 px-6 bg-slate-50 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-300 ease-in-out shadow-sm group-hover:shadow-md"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-3 text-slate-400 hover:text-black"
+                className="absolute right-4 top-4 w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-300 hover:text-slate-800 transition-all duration-300 ease-in-out"
               >
                 ✕
               </button>
@@ -185,16 +159,16 @@ export default function Home() {
         </div>
 
         {/* Categories Badges */}
-        <div className="mb-10">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">
+        <div className="mb-12">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">
             Categories
           </h2>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2 rounded-full border text-sm font-bold transition-all ${activeCategory === cat ? "bg-[#2d2f31] text-white border-[#2d2f31]" : "bg-white text-[#2d2f31] border-slate-300 hover:border-[#2d2f31]"}`}
+                className={`px-6 py-2.5 rounded-full border text-sm font-semibold transition-all duration-300 ease-in-out ${activeCategory === cat ? "bg-slate-900 text-white border-slate-900 shadow-md scale-105" : "bg-white text-slate-600 border-slate-200 hover:border-violet-300 hover:text-violet-600"}`}
               >
                 {cat}
               </button>
@@ -209,59 +183,59 @@ export default function Home() {
         </h2>
 
         {/* Course Grid with Quick Add Support */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredCourses.map((course: any) => {
-            const savedProgress =
-              typeof window !== "undefined"
-                ? localStorage.getItem(`course_${course.id}_progress`)
-                : null;
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredCourses.map((course: any) => {
+              const savedProgress =
+                typeof window !== "undefined"
+                  ? localStorage.getItem(`course_${course.id}_progress`)
+                  : null;
 
-            return (
-              <div key={course.id} className="relative group">
-                <CourseCard
-                  {...course}
-                  instructor={
-                    course.instructor?.name || "Willy L. Jaranilla III"
-                  }
-                  thumbnail={course.imageUrl}
-                  progress={
-                    isLoggedIn
-                      ? savedProgress
-                        ? parseInt(savedProgress)
-                        : course.progress
-                      : null
-                  }
-                  rating={4.8}
-                  reviews={1250}
-                />
+              return (
+                <div key={course.id} className="relative group">
+                  <CourseCard
+                    {...course}
+                    instructor={course.instructor || "Willy L. Jaranilla III"}
+                    thumbnail={course.imageUrl}
+                    progress={
+                      isLoggedIn
+                        ? savedProgress
+                          ? parseInt(savedProgress)
+                          : course.progress
+                        : null
+                    }
+                    rating={4.8}
+                    reviews={1250}
+                  />
 
-                {/* QUICK ADD BUTTON OVERLAY */}
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleAddToCart(course.title);
-                  }}
-                  className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-30 border border-slate-200 hover:bg-[#a435f0] hover:text-white"
-                  title="Add to Cart"
-                >
-                  <ShoppingCart size={16} />
-                </button>
+                  {/* QUICK ADD BUTTON OVERLAY */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleAddToCart(course);
+                    }}
+                    className="absolute top-3 right-3 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out z-30 border border-slate-100 hover:bg-violet-600 hover:text-white hover:scale-110 md:opacity-0 opacity-100"
+                    title="Add to Cart"
+                  >
+                    <ShoppingCart size={18} />
+                  </button>
+                </div>
+              );
+            })}
+            
+            {!isLoading && filteredCourses.length === 0 && (
+              <div className="col-span-full py-12 text-center text-slate-500 font-medium">
+                No courses found for the selected category or search.
               </div>
-            );
-          })}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Demo Auth Toggle */}
-      <div className="fixed bottom-4 right-4 bg-white shadow-xl border p-2 rounded-lg flex items-center gap-2 z-[9999]">
-        <span className="text-[10px] font-bold text-slate-400">DEMO AUTH:</span>
-        <button
-          onClick={toggleDemoAuth}
-          className={`text-xs font-bold px-3 py-1 rounded ${isLoggedIn ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}
-        >
-          {isLoggedIn ? "LOGOUT" : "LOGIN"}
-        </button>
-      </div>
     </div>
   );
 }
