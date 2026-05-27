@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com", // Pinapayagan natin ang Unsplash images
+        hostname: "images.unsplash.com",
       },
     ],
   },
