@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "images.unsplash.com", // Pinapayagan natin ang Unsplash images
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com", // Pinapayagan natin ang Unsplash images
+      },
     ],
   },
 };
